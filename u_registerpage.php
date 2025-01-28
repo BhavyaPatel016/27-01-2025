@@ -284,21 +284,51 @@ $conn->close();
     </div>
 
     <script>
-    // Form validation to check if passwords match
-    function validateForm() {
-        const password = document.getElementById("setpassword").value;
-        const confirmPassword = document.getElementById("confirmpassword").value;
-        const errorMessage = document.getElementById("confirm-password-error");
+        function validateForm() {
+        let isValid = true; // Flag to track the validity of the form
 
-        // Validate if passwords match
-        if (password !== confirmPassword) {
-            errorMessage.textContent = "Passwords do not match!";
-            return false; // Prevent form submission
+        // Validate name
+        validateName();
+        if (document.getElementById("name-error").textContent !== "") {
+            isValid = false;
         }
 
-        // Clear previous error message
-        errorMessage.textContent = "";
-        return true; // Allow form submission
+        // Validate phone number
+        validatePhoneNumber();
+        if (document.getElementById("phone-error").textContent !== "") {
+            isValid = false;
+        }
+
+        // Validate email
+        validateEmail();
+        if (document.getElementById("email-error").textContent !== "") {
+            isValid = false;
+        }
+
+        // Validate Aadhaar number
+        const aadhaarInput = document.getElementById("acno");
+        if (aadhaarInput.value.replace(/[^0-9]/g, '').length !== 12) {
+            document.getElementById("aadhaar-error").textContent = "Aadhaar number must be exactly 12 digits!";
+            isValid = false;
+        } else {
+            document.getElementById("aadhaar-error").textContent = "";
+        }
+
+        // Validate passwords
+        const password = document.getElementById("setpassword").value;
+        const confirmPassword = document.getElementById("confirmpassword").value;
+        if (password !== confirmPassword) {
+            document.getElementById("confirm-password-error").textContent = "Passwords do not match!";
+            isValid = false;
+        } else if (password.length < 6) {
+            document.getElementById("password-error").textContent = "Password must be at least 6 characters long!";
+            isValid = false;
+        } else {
+            document.getElementById("password-error").textContent = "";
+            document.getElementById("confirm-password-error").textContent = "";
+        }
+
+        return isValid; // Prevent form submission if any input is invalid
     }
 
     // Name validation: Only allow alphabets and spaces
@@ -318,25 +348,24 @@ $conn->close();
     }
 
     // Phone number validation: Must start with 6, 7, 8, or 9 and be exactly 10 digits
-    // Phone number validation: Must start with 6, 7, 8, or 9 and be exactly 10 digits
-function validatePhoneNumber() {
-    const phoneNumberInput = document.getElementById("number");
-    const phoneNumber = phoneNumberInput.value;
-    const regex = /^[6-9][0-9]{9}$/; // Ensure starts with 6, 7, 8, or 9 and is exactly 10 digits
-    const errorMessage = document.getElementById("phone-error");
+    function validatePhoneNumber() {
+        const phoneNumberInput = document.getElementById("number");
+        const phoneNumber = phoneNumberInput.value;
+        const regex = /^[6-9][0-9]{9}$/; // Ensure starts with 6, 7, 8, or 9 and is exactly 10 digits
+        const errorMessage = document.getElementById("phone-error");
 
-    // Remove non-numeric characters
-    phoneNumberInput.value = phoneNumber.replace(/[^0-9]/g, ''); 
+        // Remove non-numeric characters
+        phoneNumberInput.value = phoneNumber.replace(/[^0-9]/g, ''); 
 
-    // Check if the phone number matches the regex for a valid phone number
-    if (!regex.test(phoneNumberInput.value)) {
-        errorMessage.textContent = "Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits!";
-    } else {
-        errorMessage.textContent = ""; // Clear any previous error message
+        // Check if the phone number matches the regex for a valid phone number
+        if (!regex.test(phoneNumberInput.value)) {
+            errorMessage.textContent = "Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits!";
+        } else {
+            errorMessage.textContent = ""; // Clear any previous error message
+        }
     }
-}
 
-    // Function to format Aadhaar number: Limit to 12 digits and space after every 4 digits
+    // Aadhaar number validation: Limit to 12 digits and space after every 4 digits
     function formatAadhaarNumber(input) {
         let value = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
         if (value.length > 12) {
@@ -365,10 +394,13 @@ function validatePhoneNumber() {
         if (!regex.test(email)) {
             emailInput.value = email.replace(/[^a-zA-Z0-9._@]/g, '');
             errorMessage.textContent = "Email contains invalid characters!";
+        } else if (!email.includes("@") || !email.includes(".")) {
+            errorMessage.textContent = "Enter a valid email address!";
         } else {
             errorMessage.textContent = ""; // Clear any previous error message
         }
     }
+
     </script>
 </body>
 </html>
